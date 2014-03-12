@@ -56,18 +56,21 @@ public final class Client {
         SOAPService ss = new SOAPService(wsdlURL, SERVICE_NAME);
         Greeter port = ss.getSoapPort();
         String resp; 
-
+        /*
         System.out.println("Invoking sayHi...");
         resp = port.sayHi();
         System.out.println("Server responded with: " + resp);
         System.out.println();
 
+		*/
         System.out.println("Invoking greetMe...");
         resp = port.greetMe(System.getProperty("user.name"));
         System.out.println("Server responded with: " + resp);
         System.out.println();
 
+		/*
         System.out.println("Invoking greetMe with invalid length string, expecting exception...");
+        
         try {
             resp = port.greetMe("Invoking greetMe with invalid length string, expecting exception...");
         } catch (ProtocolException e) {
@@ -75,7 +78,8 @@ public final class Client {
         }
 
         System.out.println();
-
+		
+        
         System.out.println("Invoking greetMeOneWay...");
         port.greetMeOneWay(System.getProperty("user.name"));
         System.out.println("No response from server as method is OneWay");
@@ -90,6 +94,7 @@ public final class Client {
             System.out.println("FaultDetail major:" + detail.getMajor());
             System.out.println("FaultDetail minor:" + detail.getMinor());            
         }          
+        */
         System.exit(0); 
     }
 
