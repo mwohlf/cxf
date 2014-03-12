@@ -19,10 +19,22 @@
 
 package demo.hw.client;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
 import javax.xml.ws.ProtocolException;
+
+import org.apache.cxf.attachment.LazyAttachmentCollection;
+import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.message.Attachment;
 import org.apache.hello_world_soap12_http.Greeter;
 import org.apache.hello_world_soap12_http.PingMeFault;
 import org.apache.hello_world_soap12_http.SOAPService;
@@ -62,9 +74,45 @@ public final class Client {
         System.out.println("Server responded with: " + resp);
         System.out.println();
 
+
+		see: http://wso2.com/library/1675/
 		*/
+        
+     
         System.out.println("Invoking greetMe...");
         resp = port.greetMe(System.getProperty("user.name"));
+
+        org.apache.cxf.endpoint.Client client = ClientProxy.getClient(port);
+        Map<String, Object> response = client.getResponseContext();
+        
+        for (Map.Entry<String, Object> entry : response.entrySet()) {
+            System.out.println("   key: " + entry.getKey());
+            System.out.println("   value: " + entry.getValue());
+        }
+        
+        LazyAttachmentCollection collection = (LazyAttachmentCollection) response.get("org.apache.cxf.message.Message.ATTACHMENTS");
+        
+        Iterator<Attachment> iter = collection.iterator();
+        while (iter.hasNext()) {
+        	Attachment att = iter.next();
+        	DataHandler hdl = att.getDataHandler();
+        	System.out.println("id: " + att.getId() 
+        			+ " type: " + hdl.getContentType()
+        			+ " content: " + hdl.getContent()
+        			);        	
+        	InputStream is = (InputStream)hdl.getContent();
+        	ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+        	int nRead;
+        	byte[] data = new byte[16384];
+        	while ((nRead = is.read(data, 0, data.length)) != -1) {
+        	  buffer.write(data, 0, nRead);
+        	}
+        	buffer.flush();     	
+        	System.out.println("  bytes: " + Arrays.toString(buffer.toByteArray()));
+        }
+         
+        //ss.getHandlerResolver().getHandlerChain(portInfo)
         System.out.println("Server responded with: " + resp);
         System.out.println();
 
